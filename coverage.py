@@ -3,7 +3,7 @@
 #
 # Usage:
 #
-# perl coverage.py <user_login> <user_password> <URL> <project_id>
+# python coverage.py <user_login> <user_password> <URL> <project_id>
 # URL and project_id are optional
 # 'https://ecflow.testrail.net/' and 1 (id of platform project) will be used by default
 # As a result, coverage.csv file will be created
