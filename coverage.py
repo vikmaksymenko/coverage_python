@@ -55,10 +55,27 @@ for key, section in sections_dict.items():
     printProgress.printProgress(i, l, prefix=prefix, suffix='Complete', barLength=50)
 
 for section in sections:
+
+    # Debug
+    # aSection = sections_dict[section['id']]
+    # print("======")
+    # print("Section: " + aSection['name'])
+    # print("Section cases: " + str(aSection['total_cases_number']))
+    # print("Section automated cases: " + str(aSection['total_automated_cases_number']))
+
     if section['parent_id'] is not None:
         parent = sections_dict[section['parent_id']]
-        parent['total_cases_number'] += section['cases_number']
-        parent['total_automated_cases_number'] += section['automated_cases_number']
+        child = sections_dict[section['id']]
+        parent['total_cases_number'] += child['total_cases_number']
+        parent['total_automated_cases_number'] += child['total_automated_cases_number']
+
+        # Debug
+        # print("Parent: " + parent['name'])
+        # print("Parent cases: " + str(parent['total_cases_number']))
+        # print("Parent automated cases: " + str(parent['total_automated_cases_number']))
+
+    # Debug
+    # print("=====\n")
 
 with open('coverage.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -87,3 +104,31 @@ with open('coverage2.csv', 'w', newline='') as csvfile:
     writer.writerow(automated)
     writer.writerow(non_automated)
 
+with open('coverage_julia.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(['Section', 'Total Cases Number', 'Automated Cases Number'])
+    for key, section in sections_dict.items():
+        if section['depth'] == 1:
+            parent = sections_dict[section['parent_id']]
+            print('===== ' + parent['name'] + " - " + section['name'])
+            print('\tTotal cases number: ' + str(section['total_cases_number']))
+            print('\tAutomated: ' + str(section['total_automated_cases_number']))
+
+            writer.writerow([parent['name'] + ' - ' + section['name'], section['total_cases_number'], section['total_automated_cases_number']])
+
+with open('coverage_julia_2.csv', 'w', newline='') as csvfile:
+    labels = ['']
+    automated = ['Automated']
+    non_automated = ['Not Automated']
+
+    for key, section in sections_dict.items():
+        if section['depth'] == 1:
+            parent = sections_dict[section['parent_id']]
+            labels.append(parent['name'] + " - " + section['name'])
+            automated.append(section['total_automated_cases_number'])
+            non_automated.append(section['total_cases_number'] - section['total_automated_cases_number'])
+
+    writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(labels)
+    writer.writerow(automated)
+    writer.writerow(non_automated)
