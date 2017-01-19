@@ -3,7 +3,7 @@
 #
 # Usage:
 #
-# perl coverage.py <user_login> <user_password> <URL> <project_id>
+# python coverage.py <user_login> <user_password> <URL> <project_id>
 # URL and project_id are optional
 # 'https://ecflow.testrail.net/' and 1 (id of platform project) will be used by default
 # As a result, coverage.csv file will be created
@@ -39,7 +39,7 @@ print('Getting cases for each section:')
 printProgress.printProgress(i, l, prefix='Progress: {} of {}'.format(str(i), str(l)), suffix='Complete', barLength=50)
 
 for key, section in sections_dict.items():
-    cases = client.send_get('get_cases/1&section_id=' + str(section['id']))
+    cases = client.send_get('get_cases/' + str(project_id) + '&section_id=' + str(section['id']))
     section['cases_number'] = len(cases)
     section['automated_cases_number'] = 0
 
@@ -70,4 +70,20 @@ with open('coverage.csv', 'w', newline='') as csvfile:
             print('\tAutomated: ' + str(section['total_automated_cases_number']))
 
             writer.writerow([section['name'], section['total_cases_number'], section['total_automated_cases_number']])
+
+with open('coverage2.csv', 'w', newline='') as csvfile:
+    labels = ['']
+    automated = ['Automated']
+    non_automated = ['Not Automated']
+
+    for key, section in sections_dict.items():
+        if section['parent_id'] is None:
+            labels.append(section['name'])
+            automated.append(section['total_automated_cases_number'])
+            non_automated.append(section['total_cases_number'] - section['total_automated_cases_number'])
+
+    writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(labels)
+    writer.writerow(automated)
+    writer.writerow(non_automated)
 
